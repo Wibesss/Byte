@@ -23,14 +23,25 @@ GUI_WIDTH = 400
 GUI_COLOR = (150, 150, 150)
 
 FONT = pygame.font.Font(None, 36)
-INPUT_BOX = pygame.Rect(BOARD_WIDTH + 100, 50, 140, 32)
+input_boxes = [
+    pygame.Rect(BOARD_WIDTH + 100, 50, 270, 32),
+    pygame.Rect(BOARD_WIDTH + 100, 100, 270, 32),
+    pygame.Rect(BOARD_WIDTH + 100, 150, 270, 32),
+    pygame.Rect(BOARD_WIDTH + 100, 200, 270, 32),
+]
 COLOR_INACTIVE = pygame.Color('lightskyblue3')
 COLOR_ACTIVE = pygame.Color('dodgerblue2')
 color = COLOR_INACTIVE
-input_text = ""
-text_surface = FONT.render(input_text, True, color)
+input_texts = ["", "", "", ""]
+text_surfaces = [FONT.render(text, True, color) for text in input_texts]
 
-BUTTON_RECT = pygame.Rect(BOARD_WIDTH + 100, 100, 160, 50)
+
+
+
+
+
+
+BUTTON_RECT = pygame.Rect(BOARD_WIDTH + 100, 250, 160, 50)
 BUTTON_COLOR = pygame.Color('dodgerblue2')
 
 
@@ -123,39 +134,53 @@ def drawGui(win):
     pygame.draw.rect(win, GUI_COLOR, (50, 0, BOARD_WIDTH + 50, 50))
     pygame.draw.rect(win, GUI_COLOR, (0, BOARD_WIDTH + 50, BOARD_WIDTH + 50, BOARD_WIDTH + 50))
 
-    pygame.draw.rect(win, color, INPUT_BOX, 2)
-    win.blit(text_surface, (INPUT_BOX.x + 5, INPUT_BOX.y + 5))
+    for i, box in enumerate(input_boxes):
+        pygame.draw.rect(win, color, box, 2)
+        win.blit(text_surfaces[i], (box.x + 5, box.y + 5))
 
     # Draw the button
     pygame.draw.rect(win, BUTTON_COLOR, BUTTON_RECT)
     font = pygame.font.Font(None, 36)
     button_text = font.render("Odigraj", True, (255, 255, 255))
     win.blit(button_text, (BUTTON_RECT.x + 20, BUTTON_RECT.y + 15))
-    # You can add text or buttons here using pygame.draw or pygame.font
 
 
-def handleButtonClick(mouse_pos):
+def handleButtonClick(mouse_pos, input_boxes):
+    for i, box in enumerate(input_boxes):
+        if box.collidepoint(mouse_pos):
+            return i  
+    
     if BUTTON_RECT.collidepoint(mouse_pos):
-        print(input_text)
+        return "button"
+
+    
+    return None
+
+#def checkIfMoveValid(row,col,depth,direction):
+    
+
+    
 
 
-def handleInputEvent(event):
-    global input_text, color, text_surface, width
+def handleInputEvent(event, input_texts, active_input):
+    global color, text_surfaces
+
     if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_BACKSPACE:
-            input_text = input_text[:-1]
+            input_texts[active_input] = input_texts[active_input][:-1]
         else:
-            input_text += event.unicode
-        # Update the text surface
-        text_surface = FONT.render(input_text, True, color)
-        width = max(200, text_surface.get_width() + 10)
+            input_texts[active_input] += event.unicode
+
+        # Update the text surface for the active input
+        text_surfaces[active_input] = FONT.render(input_texts[active_input], True, color)
 
 
 def main(width, rows, firstMove):
     board = makeBoard(rows, width)
     highlightedPiece = None
 
-    print()
+    active_input = 0
+
 
     while True:
         for event in pygame.event.get():
@@ -164,10 +189,15 @@ def main(width, rows, firstMove):
                 pygame.quit()
                 sys.exit()
 
-            handleInputEvent(event)
+            handleInputEvent(event, input_texts, active_input)
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                handleButtonClick(pygame.mouse.get_pos())
+                clicked_input = handleButtonClick(pygame.mouse.get_pos(), input_boxes)
+                if clicked_input == "button":
+                    if all(text != "" for text in input_texts):
+                        print("Button clicked - Text inputs:", input_texts)
+                elif clicked_input is not None:
+                    active_input = clicked_input
 
         update_display(ClientWindow, board, rows, width)
 
