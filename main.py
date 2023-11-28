@@ -1,24 +1,37 @@
 import pygame
 import sys
 
-
-BOARD_WIDTH = 800
+WINDOW_WIDTH = 1280
+BOARD_WIDTH = 880
 ROWS = 8
 
 COMPUTER = pygame.image.load('CheckersRed.png')
 PLAYER = pygame.image.load('CheckersBlue.png')
+pygame.init()
+ClientWindow = pygame.display.set_mode((WINDOW_WIDTH, BOARD_WIDTH + 100))
+pygame.display.set_caption('Checkers')
+boardLabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']
+priorMoves = []
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 ORANGE = (235, 168, 52)
 BLUE = (76, 252, 241)
 
+# GUI
+GUI_WIDTH = 400
+GUI_COLOR = (150, 150, 150)
 
-pygame.init()
-ClientWindow = pygame.display.set_mode((BOARD_WIDTH, BOARD_WIDTH))
-pygame.display.set_caption('Checkers')
+FONT = pygame.font.Font(None, 36)
+INPUT_BOX = pygame.Rect(BOARD_WIDTH + 100, 50, 140, 32)
+COLOR_INACTIVE = pygame.Color('lightskyblue3')
+COLOR_ACTIVE = pygame.Color('dodgerblue2')
+color = COLOR_INACTIVE
+input_text = ""
+text_surface = FONT.render(input_text, True, color)
 
-priorMoves = []
+BUTTON_RECT = pygame.Rect(BOARD_WIDTH + 100, 100, 160, 50)
+BUTTON_COLOR = pygame.Color('dodgerblue2')
 
 
 class Piece:
@@ -43,104 +56,106 @@ class Node:
         self.pieces.append(newPiece)
 
     def draw(self, window):
-        pygame.draw.rect(window, self.colour, (self.x, self.y, BOARD_WIDTH / ROWS, BOARD_WIDTH / ROWS))
+        pygame.draw.rect(window, self.colour, (self.x + 50, self.y + 50, BOARD_WIDTH / ROWS, BOARD_WIDTH / ROWS))
         i = 0
         for piece in self.pieces:
-            window.blit(pygame.transform.scale(piece.image, (BOARD_WIDTH / ROWS, BOARD_WIDTH / ROWS)), (self.x, self.y - i * BOARD_WIDTH / ROWS * 0.15625))
+            window.blit(pygame.transform.scale(piece.image, (BOARD_WIDTH / ROWS, BOARD_WIDTH / ROWS)),
+                        (self.x + 50, self.y + 50 - i * BOARD_WIDTH / ROWS * 0.15625))
             i += 1
 
 
 def update_display(win, grid, rows, width):
-    draw_grid(win, rows, width)
+    drawGrid(win, rows, width)
+    drawGui(win)
+    drawLabels(win)
     for row in grid:
         for spot in row:
             spot.draw(win)
     pygame.display.update()
 
 
-def make_grid(rows, width):
-    grid = []
-    gap = width // rows
+def makeBoard(rows, width):
+
+    board = []
+    nodeWidth = width // rows
     for i in range(rows):
-        grid.append([])
+        board.append([])
         for j in range(rows):
-            node = Node(j, i, gap)
-            if abs(i-j) % 2 == 0:
+            node = Node(j, i, nodeWidth)
+            if abs(i - j) % 2 == 0:
                 node.colour = BLACK
             if abs(i) % 2 == 0 and rows - 1 > i > 0 == abs(i - j) % 2:
                 node.add(Piece("COMPUTER"))
-            if abs(i) % 2 == 1 and i < rows-1 and abs(i-j) % 2 == 0:
-                node.add(Piece("COMPUTER"))
-            grid[i].append(node)
-    return grid
+            if abs(i) % 2 == 1 and i < rows - 1 and abs(i - j) % 2 == 0:
+                node.add(Piece("PLAYER"))
+            board[i].append(node)
+    return board
 
 
-def draw_grid(win, rows, width):
-    gap = width // ROWS
+def drawGrid(win, rows, width):
+    nodeWidth = width // ROWS
     for i in range(rows):
-        pygame.draw.line(win, BLACK, (0, i * gap), (width, i * gap))
+        pygame.draw.line(win, BLACK, (0, i * nodeWidth), (width, i * nodeWidth))
         for j in range(rows):
-            pygame.draw.line(win, BLACK, (j * gap, 0), (j * gap, width))
+            pygame.draw.line(win, BLACK, (j * nodeWidth, 0), (j * nodeWidth, width))
 
 
-def getNode(grid, rows, width):
-    gap = width//rows
+def getNode(rows, width):
+    nodeWidth = width // rows
     RowX, RowY = pygame.mouse.get_pos()
-    Row = RowX//gap
-    Col = RowY//gap
+    Row = RowX // nodeWidth
+    Col = RowY // nodeWidth
     return Col, Row
 
 
-def resetColours(grid, node):
-    positions = generatePotentialMoves(node, grid)
-    positions.append(node)
-
-    for colouredNodes in positions:
-        nodeX, nodeY = colouredNodes
-        grid[nodeX][nodeY].colour = BLACK if abs(nodeX - nodeY) % 2 == 0 else WHITE
-
-
-def HighlightPotentialMoves(piecePosition, grid):
-    positions = generatePotentialMoves(piecePosition, grid)
-    for position in positions:
-        Column, Row = position
-        grid[Column][Row].colour = BLUE
+def drawLabels(win):
+    font = pygame.font.Font(None, 36)
+    for i in range(ROWS):
+        letter = FONT.render(boardLabels[i], True, (0, 0, 0))
+        win.blit(letter, (20, 40 + BOARD_WIDTH/ROWS/2 + BOARD_WIDTH/ROWS * i))
+        number = FONT.render(str(i + 1), True, (0, 0, 0))
+        win.blit(number, (40 + BOARD_WIDTH / ROWS / 2 + BOARD_WIDTH / ROWS * i, 20 ))
 
 
-def opposite(team):
-    return "COMPUTER" if team == "COMPUTER" else "PLAYER"
+def drawGui(win):
+    pygame.draw.rect(win, GUI_COLOR, (BOARD_WIDTH + 50, 0, GUI_WIDTH, BOARD_WIDTH + 100))
+    pygame.draw.rect(win, GUI_COLOR, (0, 0, 50, BOARD_WIDTH + 50))
+    pygame.draw.rect(win, GUI_COLOR, (50, 0, BOARD_WIDTH + 50, 50))
+    pygame.draw.rect(win, GUI_COLOR, (0, BOARD_WIDTH + 50, BOARD_WIDTH + 50, BOARD_WIDTH + 50))
+
+    pygame.draw.rect(win, color, INPUT_BOX, 2)
+    win.blit(text_surface, (INPUT_BOX.x + 5, INPUT_BOX.y + 5))
+
+    # Draw the button
+    pygame.draw.rect(win, BUTTON_COLOR, BUTTON_RECT)
+    font = pygame.font.Font(None, 36)
+    button_text = font.render("Odigraj", True, (255, 255, 255))
+    win.blit(button_text, (BUTTON_RECT.x + 20, BUTTON_RECT.y + 15))
+    # You can add text or buttons here using pygame.draw or pygame.font
 
 
-def generatePotentialMoves(nodePosition, grid):
-    positions = []
-    column, row = nodePosition
-
-    return positions
+def handleButtonClick(mouse_pos):
+    if BUTTON_RECT.collidepoint(mouse_pos):
+        print(input_text)
 
 
-"""
-Error with locating possible moves row col error
-"""
-
-
-def highlight(ClickedNode, Grid, OldHighlight):
-    Column, Row = ClickedNode
-    Grid[Column][Row].colour = ORANGE
-    if OldHighlight:
-        resetColours(Grid, OldHighlight)
-    HighlightPotentialMoves(ClickedNode, Grid)
-    return Column, Row
-
-
-"""
-def move(grid, piecePosition, newPosition):
-"""
+def handleInputEvent(event):
+    global input_text, color, text_surface, width
+    if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_BACKSPACE:
+            input_text = input_text[:-1]
+        else:
+            input_text += event.unicode
+        # Update the text surface
+        text_surface = FONT.render(input_text, True, color)
+        width = max(200, text_surface.get_width() + 10)
 
 
 def main(width, rows, firstMove):
-    grid = make_grid(rows, width)
+    board = makeBoard(rows, width)
     highlightedPiece = None
-    currMove = firstMove
+
+    print()
 
     while True:
         for event in pygame.event.get():
@@ -149,24 +164,12 @@ def main(width, rows, firstMove):
                 pygame.quit()
                 sys.exit()
 
+            handleInputEvent(event)
+
             if event.type == pygame.MOUSEBUTTONDOWN:
-                clickedNode = getNode(grid, rows, width)
-                ClickedPositionColumn, ClickedPositionRow = clickedNode
-                if grid[ClickedPositionColumn][ClickedPositionRow].colour == BLUE:
-                    """ if highlightedPiece:
-                        pieceColumn, pieceRow = highlightedPiece """
-                    """ if currMove == grid[pieceColumn][pieceRow].piece.team:
-                        resetColours(grid, highlightedPiece)
-                         currMove=move(grid, highlightedPiece, clickedNode)"""
+                handleButtonClick(pygame.mouse.get_pos())
 
-                """ elif highlightedPiece == clickedNode:
-                    pass
-                else:
-                    if grid[ClickedPositionColumn][ClickedPositionRow].piece:
-                        if currMove == grid[ClickedPositionColumn][ClickedPositionRow].piece.team:
-                            highlightedPiece = highlight(clickedNode, grid, highlightedPiece) """
-
-        update_display(ClientWindow, grid, rows, width)
+        update_display(ClientWindow, board, rows, width)
 
 
 ChosenInitialState = []
