@@ -3,8 +3,6 @@ from piece import Piece
 from square import Square
 from constants import BLACK
 from constants import WHITE
-from main import PIECE_INPUT_TEXTS
-from main import PIECE_INPUT_TEXTS_SURFACE
 
 
 boardLabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']

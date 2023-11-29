@@ -9,9 +9,6 @@ from constants import COLOR_ACTIVE
 WINDOW_WIDTH = 1680
 
 pygame.init()
-ClientWindow = pygame.display.set_mode((WINDOW_WIDTH, BOARD_WIDTH + 100))
-pygame.display.set_caption('Checkers')
-
 
 FONT = pygame.font.Font(None, 36)
 MOVE_INPUT_TEXTS = ["", "", "", ""]
@@ -19,6 +16,8 @@ PIECE_INPUT_TEXTS = ["", "", ""]
 MOVE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, COLOR_ACTIVE) for text in MOVE_INPUT_TEXTS]
 PIECE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, COLOR_ACTIVE) for text in PIECE_INPUT_TEXTS]
 
+COMPUTER = "B"
+PLAYER = "R"
 
 def handleButtonClick(mouse_pos, board):
     for i, box in enumerate(MOVE_INPUT_BOXES):
@@ -68,6 +67,14 @@ def update_display(win, grid, rows, width):
     pygame.display.update()
 
 
+def giveColors(first_move):
+    global PLAYER
+    global COMPUTER
+    if first_move == "PLAYER":
+        COMPUTER = "R"
+        PLAYER = "B"
+
+
 def main(width, rows):
     board = makeBoard(rows, width)
 
@@ -75,6 +82,11 @@ def main(width, rows):
     PIECE_ACTIVE_INPUT = None
     global PIECE_INPUT_TEXTS
     global PIECE_INPUT_TEXTS_SURFACE
+
+    giveColors(input("Choose who plays first PLAYER or COMPUTER: "))
+
+    ClientWindow = pygame.display.set_mode((WINDOW_WIDTH, BOARD_WIDTH + 100))
+    pygame.display.set_caption('Bytes')
 
     while True:
         for event in pygame.event.get():
