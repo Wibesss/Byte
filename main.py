@@ -33,17 +33,19 @@ MOVE_INPUT_BOXES = [
 ]
 BTN_MOVE_RECT = pygame.Rect(MOVE_INPUT_RECT.left + 50, MOVE_INPUT_RECT.top + 200, 160, 50)
 MOVE_INPUT_TEXTS = ["", "", "", ""]
+PIECE_INPUT_TEXTS=["","",""]
 COLOR_INACTIVE = pygame.Color('lightskyblue3')
 COLOR_ACTIVE = pygame.Color('dodgerblue2')
 color = COLOR_ACTIVE
 MOVE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, color) for text in MOVE_INPUT_TEXTS]
+PIECE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, color) for text in PIECE_INPUT_TEXTS]
 
-PIECE_INPUT_RECT = pygame.Rect(BOARD_WIDTH + 50, 300, 270, 150)
+PIECE_INPUT_RECT = pygame.Rect(BOARD_WIDTH + 50+ 350, 300, 270, 150)
 PIECE_INPUT_BOXES = [
     pygame.Rect(PIECE_INPUT_RECT.left + 50, PIECE_INPUT_RECT.top, 270, 32),
     pygame.Rect(PIECE_INPUT_RECT.left + 50, PIECE_INPUT_RECT.top + 50, 270, 32),
     pygame.Rect(PIECE_INPUT_RECT.left + 50, PIECE_INPUT_RECT.top + 100, 270, 32),
-    pygame.Rect(PIECE_INPUT_RECT.left + 50, PIECE_INPUT_RECT.top + 150, 270, 32),
+
 ]
 BTN_PIECE_RECT = pygame.Rect(PIECE_INPUT_RECT.left + 50, PIECE_INPUT_RECT.top + 200, 160, 50)
 
@@ -88,6 +90,9 @@ class Node:
     def clearPieces(self):
         self.pieces.clear()
 
+    def returnNumberOfPieces(self):
+        return len(self.pieces)  
+
 
 def update_display(win, grid, rows, width):
     drawGrid(win, rows, width)
@@ -123,6 +128,8 @@ def clearBoard(board):
 
 
 def resetBoard(board):
+    clearBoard(board)
+    board.clear()
     nodeWidth = BOARD_WIDTH / ROWS
     for i in range(ROWS):
         board.append([])
@@ -172,14 +179,21 @@ def drawGui(win):
         pygame.draw.rect(win, color, box, 2)
         win.blit(MOVE_INPUT_TEXTS_SURFACE[i], (box.x + 5, box.y + 5))
 
-    for i, box in enumerate(MOVE_INPUT_BOXES):
+    for i, box in enumerate(PIECE_INPUT_BOXES):
         pygame.draw.rect(win, color, box, 2)
-        win.blit(MOVE_INPUT_TEXTS_SURFACE[i], (box.x + 5, box.y + 5))
+        win.blit(PIECE_INPUT_TEXTS_SURFACE[i], (box.x + 5, box.y + 5))
 
     pygame.draw.rect(win, BUTTON_COLOR, BTN_MOVE_RECT)
     font = pygame.font.Font(None, 36)
     button_text = font.render("Odigraj", True, (255, 255, 255))
     win.blit(button_text, (BTN_MOVE_RECT.x + 20, BTN_MOVE_RECT.y + 15))
+
+    pygame.draw.rect(win, BUTTON_COLOR, BTN_PIECE_RECT)
+    font = pygame.font.Font(None, 36)
+    button_text = font.render("Dodaj", True, (255, 255, 255))
+    win.blit(button_text, (BTN_PIECE_RECT.x + 20, BTN_PIECE_RECT.y + 15))
+
+
 
     pygame.draw.rect(win, BTN_CLEAN_BOARD_COLOR, BTN_CLEAN_BOARD_RECT)
     font = pygame.font.Font(None, 36)
@@ -195,40 +209,65 @@ def drawGui(win):
 def handleButtonClick(mouse_pos, board):
     for i, box in enumerate(MOVE_INPUT_BOXES):
         if box.collidepoint(mouse_pos):
-            return i
+            return "move", i
+    for i, box in enumerate(PIECE_INPUT_BOXES):
+        if box.collidepoint(mouse_pos):
+            return "piece", i
 
     if BTN_MOVE_RECT.collidepoint(mouse_pos):
-        return print(MOVE_INPUT_TEXTS)
+        return "button_move", None
+
+    if BTN_PIECE_RECT.collidepoint(mouse_pos):
+        return "button_piece", None
 
     if BTN_CLEAN_BOARD_RECT.collidepoint(mouse_pos):
-        return clearBoard(board)
+        return "button_clean", None
 
     if BTN_RESET_BOARD_RECT.collidepoint(mouse_pos):
-        return resetBoard(board)
+        return "button_reset", None
 
-    return None
+    return None, None
 
 
 # def checkIfMoveValid(row,col,depth,direction):
 
 
-def handleInputEvent(event, MOVE_ACTIVE_INPUT):
-    global color, MOVE_INPUT_TEXTS_SURFACE
+def handleInputEvent(event, active_input_list, active_input_index):
+    global color
 
     if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_BACKSPACE:
-            MOVE_INPUT_TEXTS[MOVE_ACTIVE_INPUT] = MOVE_INPUT_TEXTS[MOVE_ACTIVE_INPUT][:-1]
+            active_input_list[active_input_index] = active_input_list[active_input_index][:-1]
         else:
-            MOVE_INPUT_TEXTS[MOVE_ACTIVE_INPUT] += event.unicode
+            active_input_list[active_input_index] += event.unicode
 
-        MOVE_INPUT_TEXTS_SURFACE[MOVE_ACTIVE_INPUT] = FONT.render(MOVE_INPUT_TEXTS[MOVE_ACTIVE_INPUT], True, color)
+        active_input_surface = FONT.render(active_input_list[active_input_index], True, color)
+
+        return active_input_surface
+
+    return None
+
+def addPieceToNode(row,col,color,board):
+
+    if board[row][col].returnNumberOfPieces() == 7:
+        raise ValueError("You cannot add more than 7 pieces to a stack")
+
+    if 0 <= row < len(board) and 0 <= col < len(board[0]):
+        if color not in ["B", "R"]:
+            raise ValueError("Invalid color. Accepted values are 'B' or 'R'.")
+    
+        new_piece = Piece(color)
+        board[row][col].add(new_piece)
+
+
 
 
 def main(width, rows, firstMove):
     board = makeBoard(rows, width)
     highlightedPiece = None
 
-    MOVE_ACTIVE_INPUT = 0
+    MOVE_ACTIVE_INPUT = None
+    PIECE_ACTIVE_INPUT = None
 
     while True:
         for event in pygame.event.get():
@@ -237,12 +276,41 @@ def main(width, rows, firstMove):
                 pygame.quit()
                 sys.exit()
 
-            handleInputEvent(event, MOVE_ACTIVE_INPUT)
+            if MOVE_ACTIVE_INPUT is not None:
+                move_input_surface = handleInputEvent(event, MOVE_INPUT_TEXTS, MOVE_ACTIVE_INPUT)
+                if move_input_surface is not None:
+                    MOVE_INPUT_TEXTS_SURFACE[MOVE_ACTIVE_INPUT] = move_input_surface
+            elif PIECE_ACTIVE_INPUT is not None:
+                piece_input_surface = handleInputEvent(event, PIECE_INPUT_TEXTS, PIECE_ACTIVE_INPUT)
+                if piece_input_surface is not None:
+                    PIECE_INPUT_TEXTS_SURFACE[PIECE_ACTIVE_INPUT] = piece_input_surface
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                clicked_input = handleButtonClick(pygame.mouse.get_pos(), board)
+                input_type, clicked_input = handleButtonClick(pygame.mouse.get_pos(), board)
                 if clicked_input is not None:
-                    MOVE_ACTIVE_INPUT = clicked_input
+                    if input_type == "move":
+                        MOVE_ACTIVE_INPUT = clicked_input
+                        PIECE_ACTIVE_INPUT = None
+                    elif input_type == "piece":
+                        PIECE_ACTIVE_INPUT = clicked_input
+                        MOVE_ACTIVE_INPUT = None
+                elif clicked_input is None and input_type is not None:
+                    if input_type == "button_clean":
+                        clearBoard(board)
+                    elif input_type == "button_reset":
+                        resetBoard(board)
+                    elif input_type == "button_move":
+                        if all(text != '' for text in MOVE_INPUT_TEXTS):
+                            print("Move Button Clicked - Text inputs:", MOVE_INPUT_TEXTS)
+                    elif input_type == "button_piece":
+                        if all(text != '' for text in PIECE_INPUT_TEXTS):
+                            try:
+                                row = boardLabels.index(PIECE_INPUT_TEXTS[0])
+                                col = int(PIECE_INPUT_TEXTS[1])-1  
+                                color = PIECE_INPUT_TEXTS[2]
+                                addPieceToNode(row, col, color,board)
+                            except ValueError as e:
+                                print(f"Error: {e}")
 
         update_display(ClientWindow, board, rows, width)
 
