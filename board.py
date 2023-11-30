@@ -1,6 +1,7 @@
 import pygame
 from piece import Piece
 from square import Square
+from constants import ROWS
 from constants import BLACK
 from constants import WHITE
 
@@ -79,3 +80,42 @@ def addPieceToSquare(row, col, pieceColor, board):
         new_piece = Piece(pieceColor)
         board[row][col].add(new_piece)
 
+
+def checkIfMoveIsValid(row, col, heightInStack, direction, board):
+    if not squareInBoard(row, col):
+        print("Square not in board")
+        return
+    elif not piecesOnSquare(row, col, board):
+        print("There are no pieces on this square")
+    elif not pieceInStack(row, col, heightInStack, board):
+        print("There is no piece of that height in stack")
+    elif not directionPossible(row, col, direction):
+        print("Direction you chose is not possible")
+    else:
+        print("Move is Valid")
+
+
+def squareInBoard(row, col):
+    return True if row in boardLabels and boardLabels.index(row) < ROWS and int(col) - 1 < ROWS else False
+
+
+def piecesOnSquare(row, col, board):
+    return board[boardLabels.index(row)][int(col)-1].hasPieces()
+
+
+def pieceInStack(row, col, heightInStack, board):
+    return True if 0 <= int(heightInStack) < board[boardLabels.index(row)][int(col)-1].returnNumberOfPieces() else False
+
+
+def directionPossible(row, col, direction):
+    if direction == "DD":
+        return True if boardLabels.index(row) < ROWS-1 and int(col) < ROWS else False
+
+    if direction == "DL":
+        return True if boardLabels.index(row) < ROWS-1 and int(col) > 1 else False
+
+    if direction == "GD":
+        return True if boardLabels.index(row) > 0 and int(col) < ROWS else False
+
+    if direction == "GL":
+        return True if boardLabels.index(row) > 0 and int(col) > 1 else False

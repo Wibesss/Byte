@@ -29,3 +29,6 @@ class Square:
 
     def returnNumberOfPieces(self):
         return len(self.pieces)
+
+    def hasPieces(self):
+        return True if len(self.pieces) > 0 else False

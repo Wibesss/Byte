@@ -5,7 +5,6 @@ from constants import BOARD_WIDTH
 from constants import ROWS
 from constants import COLOR_ACTIVE
 
-
 WINDOW_WIDTH = 1680
 
 pygame.init()
@@ -19,7 +18,8 @@ PIECE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, COLOR_ACTIVE) for text in P
 COMPUTER = "B"
 PLAYER = "R"
 
-def handleButtonClick(mouse_pos, board):
+
+def handleButtonClick(mouse_pos):
     for i, box in enumerate(MOVE_INPUT_BOXES):
         if box.collidepoint(mouse_pos):
             return "move", i
@@ -43,7 +43,6 @@ def handleButtonClick(mouse_pos, board):
 
 
 def handleInputEvent(event, active_input_list, active_input_index):
-
     if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_BACKSPACE:
             active_input_list[active_input_index] = active_input_list[active_input_index][:-1]
@@ -75,15 +74,15 @@ def giveColors(first_move):
         PLAYER = "B"
 
 
-def main(width, rows):
-    board = makeBoard(rows, width)
-
+def main():
     MOVE_ACTIVE_INPUT = None
     PIECE_ACTIVE_INPUT = None
     global PIECE_INPUT_TEXTS
     global PIECE_INPUT_TEXTS_SURFACE
 
     giveColors(input("Choose who plays first PLAYER or COMPUTER: "))
+
+    board = makeBoard(ROWS, BOARD_WIDTH)
 
     ClientWindow = pygame.display.set_mode((WINDOW_WIDTH, BOARD_WIDTH + 100))
     pygame.display.set_caption('Bytes')
@@ -125,23 +124,27 @@ def main(width, rows):
 
                     elif input_type == "button_move":
                         if all(text != '' for text in MOVE_INPUT_TEXTS):
-                            print("Move Button Clicked - Text inputs:", MOVE_INPUT_TEXTS)
+                            row = MOVE_INPUT_TEXTS[0]
+                            col = MOVE_INPUT_TEXTS[1]
+                            heightInStack = MOVE_INPUT_TEXTS[2]
+                            direction = MOVE_INPUT_TEXTS[3]
+                            checkIfMoveIsValid(row, col, heightInStack, direction, board)
 
                     elif input_type == "button_piece":
                         if all(text != '' for text in PIECE_INPUT_TEXTS):
                             try:
                                 row = boardLabels.index(PIECE_INPUT_TEXTS[0])
-                                col = int(PIECE_INPUT_TEXTS[1])-1  
+                                col = int(PIECE_INPUT_TEXTS[1]) - 1
                                 color = PIECE_INPUT_TEXTS[2]
                                 addPieceToSquare(row, col, color, board)
                                 PIECE_INPUT_TEXTS = ["", "", ""]
-                                PIECE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, COLOR_ACTIVE) for text in PIECE_INPUT_TEXTS]
+                                PIECE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, COLOR_ACTIVE) for text in
+                                                             PIECE_INPUT_TEXTS]
                             except ValueError as e:
                                 print(f"Error: {e}")
 
-        update_display(ClientWindow, board, rows, width)
+        update_display(ClientWindow, board, ROWS, BOARD_WIDTH)
 
 
 if __name__ == "__main__":
-    main(BOARD_WIDTH, ROWS)
-
+    main()
