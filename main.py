@@ -1,4 +1,5 @@
 import sys
+import math
 from board import *
 from gui import *
 from constants import BOARD_WIDTH
@@ -18,6 +19,18 @@ PIECE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, COLOR_ACTIVE) for text in P
 COMPUTER = "B"
 PLAYER = "R"
 
+RED_PLAYER_POINTS=2
+BLUE_PLAYER_POINTS=0
+
+
+def getNumberOfRows():
+    global ROWS
+    while True:
+        ROWS = int(input("Choose the number of rows (8, 10, or 16): "))
+        if ROWS not in [8, 10, 16]:
+            print("Invalid input. Please choose 8, 10, or 16.")
+        else:
+            return
 
 def handleButtonClick(mouse_pos):
     for i, box in enumerate(MOVE_INPUT_BOXES):
@@ -55,14 +68,12 @@ def handleInputEvent(event, active_input_list, active_input_index):
 
     return None
 
-
 def update_display(win, grid, rows, width):
-    drawGrid(win, rows, width)
     drawGui(win, MOVE_INPUT_TEXTS_SURFACE, PIECE_INPUT_TEXTS_SURFACE)
     drawLabels(win, rows, width)
     for row in grid:
         for spot in row:
-            spot.draw(win)
+            spot.draw(win,rows)
     pygame.display.update()
 
 
@@ -74,12 +85,31 @@ def giveColors(first_move):
         PLAYER = "B"
 
 
+def isGameFinished(board):
+    global RED_PLAYER_POINTS, BLUE_PLAYER_POINTS, ROWS
+    if isBoardClear(board):
+        return True
+    elif RED_PLAYER_POINTS == math.ceil(((ROWS/2)*(ROWS-2)/8)/2):
+        return True
+    elif BLUE_PLAYER_POINTS == math.ceil(((ROWS/2)*(ROWS-2)/8)/2):
+        return True
+    
+    return False
+
+
+
+
 def main():
     MOVE_ACTIVE_INPUT = None
     PIECE_ACTIVE_INPUT = None
     global PIECE_INPUT_TEXTS
     global PIECE_INPUT_TEXTS_SURFACE
+    global ROWS
+    global BOARD_WIDTH
 
+    getNumberOfRows()
+
+    print(ROWS)
     giveColors(input("Choose who plays first PLAYER or COMPUTER: "))
 
     board = makeBoard(ROWS, BOARD_WIDTH)
@@ -104,7 +134,7 @@ def main():
                     PIECE_INPUT_TEXTS_SURFACE[PIECE_ACTIVE_INPUT] = piece_input_surface
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                input_type, clicked_input = handleButtonClick(pygame.mouse.get_pos(), board)
+                input_type, clicked_input = handleButtonClick(pygame.mouse.get_pos())
 
                 if clicked_input is not None:
                     if input_type == "move":
@@ -128,21 +158,18 @@ def main():
                             col = MOVE_INPUT_TEXTS[1]
                             heightInStack = MOVE_INPUT_TEXTS[2]
                             direction = MOVE_INPUT_TEXTS[3]
-                            checkIfMoveIsValid(row, col, heightInStack, direction, board)
+                            print(row,col,heightInStack,direction)
+                            checkIfMoveIsValid(row, col, heightInStack, direction, board,ROWS)
 
                     elif input_type == "button_piece":
                         if all(text != '' for text in PIECE_INPUT_TEXTS):
-                            try:
-                                row = boardLabels.index(PIECE_INPUT_TEXTS[0])
-                                col = int(PIECE_INPUT_TEXTS[1]) - 1
-                                color = PIECE_INPUT_TEXTS[2]
-                                addPieceToSquare(row, col, color, board)
-                                PIECE_INPUT_TEXTS = ["", "", ""]
-                                PIECE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, COLOR_ACTIVE) for text in
-                                                             PIECE_INPUT_TEXTS]
-                            except ValueError as e:
-                                print(f"Error: {e}")
-
+                            row = PIECE_INPUT_TEXTS[0]
+                            col = PIECE_INPUT_TEXTS[1]
+                            color = PIECE_INPUT_TEXTS[2]
+                            addPieceToSquare(row, col, color, board,ROWS)
+                            PIECE_INPUT_TEXTS = ["", "", ""]
+                            PIECE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, COLOR_ACTIVE) for text in PIECE_INPUT_TEXTS]
+                        
         update_display(ClientWindow, board, ROWS, BOARD_WIDTH)
 
 

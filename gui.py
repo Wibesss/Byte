@@ -6,7 +6,7 @@ GUI_WIDTH = 800
 GUI_COLOR = (150, 150, 150)
 
 
-MOVE_INPUT_RECT = pygame.Rect(BOARD_WIDTH + 150, 50, 270, 150)
+MOVE_INPUT_RECT = pygame.Rect(BOARD_WIDTH + 300, 50, 270, 150)
 MOVE_INPUT_BOXES = [
     pygame.Rect(MOVE_INPUT_RECT.left + 50, MOVE_INPUT_RECT.top, 270, 32),
     pygame.Rect(MOVE_INPUT_RECT.left + 50, MOVE_INPUT_RECT.top + 50, 270, 32),
@@ -16,7 +16,7 @@ MOVE_INPUT_BOXES = [
 BTN_MOVE_RECT = pygame.Rect(MOVE_INPUT_RECT.left + 50, MOVE_INPUT_RECT.top + 200, 200, 50)
 
 
-PIECE_INPUT_RECT = pygame.Rect(BOARD_WIDTH + 150, 350, 270, 150)
+PIECE_INPUT_RECT = pygame.Rect(BOARD_WIDTH + 300, 350, 270, 150)
 PIECE_INPUT_BOXES = [
     pygame.Rect(PIECE_INPUT_RECT.left + 50, PIECE_INPUT_RECT.top, 270, 32),
     pygame.Rect(PIECE_INPUT_RECT.left + 50, PIECE_INPUT_RECT.top + 50, 270, 32),
@@ -40,9 +40,21 @@ def drawGui(win, MOVE_INPUT_TEXTS_SURFACE, PIECE_INPUT_TEXTS_SURFACE):
     pygame.draw.rect(win, GUI_COLOR, (50, 0, BOARD_WIDTH + 50, 50))
     pygame.draw.rect(win, GUI_COLOR, (0, BOARD_WIDTH + 50, BOARD_WIDTH + 50, BOARD_WIDTH + 50))
 
+
+    labels = ["Row:", "Col:", "Place on stack:", "Move direction:"]
+    font = pygame.font.Font(None, 36)
+    for i, label in enumerate(labels):
+        label_surface = font.render(label, True, COLOR_ACTIVE)
+        win.blit(label_surface, (MOVE_INPUT_BOXES[i].left - 250, MOVE_INPUT_BOXES[i].top + 5))
+
     for i, box in enumerate(MOVE_INPUT_BOXES):
         pygame.draw.rect(win, COLOR_ACTIVE, box, 2)
         win.blit(MOVE_INPUT_TEXTS_SURFACE[i], (box.x + 5, box.y + 5))
+
+        piece_labels = ["Row:", "Col:", "Color(R or B):"]
+    for i, label in enumerate(piece_labels):
+        label_surface = font.render(label, True, COLOR_ACTIVE)
+        win.blit(label_surface, (PIECE_INPUT_BOXES[i].left - 250, PIECE_INPUT_BOXES[i].top + 5))
 
     for i, box in enumerate(PIECE_INPUT_BOXES):
         pygame.draw.rect(win, COLOR_ACTIVE, box, 2)

@@ -16,12 +16,13 @@ class Square:
     def add(self, newPiece):
         self.pieces.append(newPiece)
 
-    def draw(self, window):
-        pygame.draw.rect(window, self.color, (self.x + 50, self.y + 50, BOARD_WIDTH / ROWS, BOARD_WIDTH / ROWS))
+    def draw(self, window,rows):
+        global ROWS
+        pygame.draw.rect(window, self.color, (self.x + 50, self.y + 50, BOARD_WIDTH / rows, BOARD_WIDTH / rows))
         i = 0
         for piece in self.pieces:
-            window.blit(pygame.transform.scale(piece.image, (BOARD_WIDTH / ROWS, BOARD_WIDTH / ROWS)),
-                        (self.x + 50, self.y + 50 - i * BOARD_WIDTH / ROWS * 0.15625))
+            window.blit(pygame.transform.scale(piece.image, (BOARD_WIDTH / rows, BOARD_WIDTH / rows)),
+                        (self.x + 50, self.y + 50 - i * BOARD_WIDTH / rows * 0.15625))
             i += 1
 
     def clearPieces(self):
