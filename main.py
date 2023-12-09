@@ -18,8 +18,9 @@ PIECE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, COLOR_ACTIVE) for text in P
 
 COMPUTER = "B"
 PLAYER = "R"
+CURRENT_TURN="B"
 
-RED_PLAYER_POINTS=2
+RED_PLAYER_POINTS=0
 BLUE_PLAYER_POINTS=0
 
 
@@ -54,6 +55,51 @@ def handleButtonClick(mouse_pos):
 
     return None, None
 
+def changeTurn():
+    global CURRENT_TURN
+    if CURRENT_TURN == "B":
+        print("Next turn: RED")
+        CURRENT_TURN="R"
+    else:
+        print("Next turn: BLUE")
+        CURRENT_TURN = "B"
+
+def playMove(row, col, heightInStack, direction, board, ROWS):
+    global BLUE_PLAYER_POINTS
+    global RED_PLAYER_POINTS
+    intRow = boardLabels.index(row)
+    intCol = int(col) - 1
+    intHeightInStack=int(heightInStack)
+
+    currentSquare = board[intRow][intCol]
+
+    if direction == 'GL':
+        newRow, newCol = intRow - 1, intCol - 1
+    elif direction == 'GD':
+        newRow, newCol = intRow - 1, intCol + 1
+    elif direction == 'DL':
+        newRow, newCol = intRow + 1, intCol - 1
+    elif direction == 'DD':
+        newRow, newCol = intRow + 1, intCol + 1
+
+    if not (0 <= newRow < ROWS) or not (0 <= newCol < ROWS):
+        return
+
+    newSquare = board[newRow][newCol]
+
+    for i in range(intHeightInStack, currentSquare.returnNumberOfPieces()):
+        piece = currentSquare.returnPiece(i)
+        newSquare.add(piece)
+
+    currentSquare.removePieces(intHeightInStack)
+    if newSquare.checkIfCompleted():
+        topPieceColor=newSquare.returnPiece(7).returnColor()
+        if topPieceColor=='B':
+            BLUE_PLAYER_POINTS+=1
+        else:
+            RED_PLAYER_POINTS+=1
+        newSquare.clearPieces()
+
 
 def handleInputEvent(event, active_input_list, active_input_index):
     if event.type == pygame.KEYDOWN:
@@ -69,7 +115,10 @@ def handleInputEvent(event, active_input_list, active_input_index):
     return None
 
 def update_display(win, grid, rows, width):
-    drawGui(win, MOVE_INPUT_TEXTS_SURFACE, PIECE_INPUT_TEXTS_SURFACE)
+    if CURRENT_TURN=="B":
+        drawGui(win, MOVE_INPUT_TEXTS_SURFACE, PIECE_INPUT_TEXTS_SURFACE,"BLUE")
+    else:
+        drawGui(win, MOVE_INPUT_TEXTS_SURFACE, PIECE_INPUT_TEXTS_SURFACE,"RED")
     drawLabels(win, rows, width)
     for row in grid:
         for spot in row:
@@ -93,7 +142,6 @@ def isGameFinished(board):
         return True
     elif BLUE_PLAYER_POINTS == math.ceil(((ROWS/2)*(ROWS-2)/8)/2):
         return True
-    
     return False
 
 
@@ -109,7 +157,6 @@ def main():
 
     getNumberOfRows()
 
-    print(ROWS)
     giveColors(input("Choose who plays first PLAYER or COMPUTER: "))
 
     board = makeBoard(ROWS, BOARD_WIDTH)
@@ -158,8 +205,16 @@ def main():
                             col = MOVE_INPUT_TEXTS[1]
                             heightInStack = MOVE_INPUT_TEXTS[2]
                             direction = MOVE_INPUT_TEXTS[3]
-                            print(row,col,heightInStack,direction)
-                            checkIfMoveIsValid(row, col, heightInStack, direction, board,ROWS)
+                            if checkIfMoveIsValid(row, col, heightInStack, direction, board,ROWS,CURRENT_TURN):
+                                changeTurn()
+                                playMove(row, col, heightInStack, direction, board,ROWS)
+                                print("Red Points:",RED_PLAYER_POINTS)
+                                print("Blue Points:",BLUE_PLAYER_POINTS)
+                                if isGameFinished(board):
+                                    print('EXIT SUCCESSFUL')
+                                    pygame.quit()
+                                    sys.exit()
+                              
 
                     elif input_type == "button_piece":
                         if all(text != '' for text in PIECE_INPUT_TEXTS):
@@ -167,8 +222,8 @@ def main():
                             col = PIECE_INPUT_TEXTS[1]
                             color = PIECE_INPUT_TEXTS[2]
                             addPieceToSquare(row, col, color, board,ROWS)
-                            PIECE_INPUT_TEXTS = ["", "", ""]
-                            PIECE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, COLOR_ACTIVE) for text in PIECE_INPUT_TEXTS]
+                            # PIECE_INPUT_TEXTS = ["", "", ""]
+                            # PIECE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, COLOR_ACTIVE) for text in PIECE_INPUT_TEXTS]
                         
         update_display(ClientWindow, board, ROWS, BOARD_WIDTH)
 

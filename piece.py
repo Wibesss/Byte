@@ -8,3 +8,6 @@ class Piece:
     def __init__(self, team):
         self.team = team
         self.image = BLUE_PLAYER if self.team == 'B' else RED_PLAYER
+
+    def returnColor(self):
+        return self.team

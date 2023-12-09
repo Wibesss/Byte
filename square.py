@@ -24,12 +24,21 @@ class Square:
             window.blit(pygame.transform.scale(piece.image, (BOARD_WIDTH / rows, BOARD_WIDTH / rows)),
                         (self.x + 50, self.y + 50 - i * BOARD_WIDTH / rows * 0.15625))
             i += 1
+    
+    def removePieces(self, index):
+        self.pieces = self.pieces[:index]
 
     def clearPieces(self):
         self.pieces.clear()
+    
+    def returnPiece(self,index):
+        return self.pieces[index]
 
     def returnNumberOfPieces(self):
         return len(self.pieces)
 
     def hasPieces(self):
         return True if len(self.pieces) > 0 else False
+    
+    def checkIfCompleted(self):
+        return True if self.returnNumberOfPieces()==8 else False
