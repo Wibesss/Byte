@@ -1,3 +1,5 @@
+import copy
+import math
 import pygame
 from piece import Piece
 from square import Square
@@ -6,14 +8,18 @@ from constants import BLACK
 from constants import WHITE
 from main import RED_PLAYER_POINTS
 from main import BLUE_PLAYER_POINTS
+from main import playMove
 
 
 boardLabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P']
 
+RED_PLAYER_POINTS=0
+BLUE_PLAYER_POINTS=0
 
 def makeBoard(rows, width):
     global ROWS
     board = []
+
     squareWidth = width // rows
     for i in range(rows):
         board.append([])
@@ -161,6 +167,47 @@ def compareDistances(intRow,intCol,direction,rows,board):
         return False
 
     
+def getAllMoves(board, rows, current_turn):
+    all_valid_moves = []
+    all_invalid_moves = []
+    newBoards = []
+
+    for i in range(rows):
+        for j in range(rows):
+            if board[i][j].returnColor() == BLACK and board[i][j].hasPieces():
+                for direction in ["DD", "DL", "GD", "GL"]:
+                    for height in range(board[i][j].returnNumberOfPieces()):
+                        move_validity = checkIfMoveIsValid(boardLabels[i], str(j + 1), height, direction, board, rows, current_turn)
+
+                        move_info = {"position": (boardLabels[i], str(j + 1)), "direction": direction, "height": height}
+
+                        if move_validity:
+                            all_valid_moves.append(move_info)
+
+                            new_board = [row[:] for row in board]
+                           #playMove(move_info['position'][0],move_info['position'][1],move_info['height'],move_info['direction'],new_board,rows)
+                            newBoards.append(new_board)
+
+                        else:
+                            all_invalid_moves.append(move_info)
+
+    print(f"Valid Moves {current_turn}: ")
+    for move in all_valid_moves:
+        print(f"  {move['position'][0]} {move['position'][1]} {move['height']} {move['direction']}")
+
+    print(f"\nInvalid Moves {current_turn}:")
+    for move in all_invalid_moves:
+        print(f"  {move['position'][0]} {move['position'][1]} {move['height']} {move['direction']}")
+
+def isGameFinished(board):
+    global RED_PLAYER_POINTS, BLUE_PLAYER_POINTS, ROWS
+    if isBoardClear(board):
+        return True
+    elif RED_PLAYER_POINTS == math.ceil(((ROWS/2)*(ROWS-2)/8)/2):
+        return True
+    elif BLUE_PLAYER_POINTS == math.ceil(((ROWS/2)*(ROWS-2)/8)/2):
+        return True
+    return False
 
                                
                

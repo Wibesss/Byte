@@ -80,7 +80,10 @@ def drawGui(win, MOVE_INPUT_TEXTS_SURFACE, PIECE_INPUT_TEXTS_SURFACE,current_tur
     button_text = font.render("Reset Board", True, (255, 255, 255))
     win.blit(button_text, (BTN_RESET_BOARD_RECT.x + 20, BTN_RESET_BOARD_RECT.y + 15))
 
-    turn_text = font.render(f"Current Turn: {current_turn}", True, (255, 255, 255))
-    win.blit(turn_text, (BOARD_WIDTH + 70, BOARD_WIDTH + 10))
+    if current_turn=="BLUE":
+        turn_text = font.render(f"Current Turn: {current_turn}", True, (0, 0, 255))
+    else:
+        turn_text = font.render(f"Current Turn: {current_turn}", True, (255, 0, 0))
+    win.blit(turn_text, (BOARD_WIDTH + 250, 100))
 
 

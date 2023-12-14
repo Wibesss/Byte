@@ -164,12 +164,15 @@ def main():
     ClientWindow = pygame.display.set_mode((WINDOW_WIDTH, BOARD_WIDTH + 100))
     pygame.display.set_caption('Bytes')
 
+    getAllMoves(board, ROWS, CURRENT_TURN)
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 print('EXIT SUCCESSFUL')
                 pygame.quit()
                 sys.exit()
+               
 
             if MOVE_ACTIVE_INPUT is not None:
                 move_input_surface = handleInputEvent(event, MOVE_INPUT_TEXTS, MOVE_ACTIVE_INPUT)
@@ -214,6 +217,7 @@ def main():
                                     print('EXIT SUCCESSFUL')
                                     pygame.quit()
                                     sys.exit()
+                                getAllMoves(board, ROWS, CURRENT_TURN)
                               
 
                     elif input_type == "button_piece":

@@ -42,3 +42,6 @@ class Square:
     
     def checkIfCompleted(self):
         return True if self.returnNumberOfPieces()==8 else False
+    
+    def returnColor(self):
+        return self.color
