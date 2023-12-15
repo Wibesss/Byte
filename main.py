@@ -3,7 +3,6 @@ import math
 from board import *
 from gui import *
 from constants import BOARD_WIDTH
-from constants import ROWS
 from constants import COLOR_ACTIVE
 
 WINDOW_WIDTH = 1680
@@ -153,6 +152,8 @@ def main():
                                     pygame.quit()
                                     sys.exit()
                                 board.getAllMoves()
+                            else:
+                                board.changeTurn()
                               
 
                     elif input_type == "button_piece":
@@ -161,6 +162,7 @@ def main():
                             col = PIECE_INPUT_TEXTS[1]
                             color = PIECE_INPUT_TEXTS[2]
                             board.addPieceToSquare(row, col, color)
+                            board.getAllMoves()
                             # PIECE_INPUT_TEXTS = ["", "", ""]
                             # PIECE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, COLOR_ACTIVE) for text in PIECE_INPUT_TEXTS]
                         

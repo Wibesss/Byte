@@ -1,6 +1,5 @@
 import pygame
 from constants import BOARD_WIDTH
-from constants import ROWS
 from constants import WHITE
 
 
@@ -17,7 +16,6 @@ class Square:
         self.pieces.append(newPiece)
 
     def draw(self, window,rows):
-        global ROWS
         pygame.draw.rect(window, self.color, (self.x + 50, self.y + 50, BOARD_WIDTH / rows, BOARD_WIDTH / rows))
         i = 0
         for piece in self.pieces:

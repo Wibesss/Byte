@@ -3,7 +3,6 @@ import math
 import pygame
 from piece import Piece
 from square import Square
-from constants import ROWS
 from constants import BLACK
 from constants import WHITE
 from main import drawGui
@@ -86,7 +85,7 @@ class Board:
     def addPieceToSquare(self,row, col, pieceColor):
         intRow=boardLabels.index(row)
         intCol=int(col)
-        if not self.squareInBoard(row, col,self.rows) or intCol< 1:
+        if not self.squareInBoard(row, col) or intCol< 1:
             print("Square not in board")
             return
         if self.board[intRow][intCol-1].color == WHITE:
@@ -224,6 +223,8 @@ class Board:
             if i>=0 and i<self.rows:
                 if (row-distance>=0 and self.board[row-distance][i].hasPieces()) or (row+distance<self.rows and self.board[row+distance][i].hasPieces()):
                         return distance
+        if distance==self.rows:
+            return distance
         return self.findClosestPiece(row,col,distance+1)
         
 
@@ -272,7 +273,7 @@ class Board:
                             else:
                                 all_invalid_moves.append(move_info)
 
-        print(f"Valid Moves {self.current_turn}: ")
+        print(f"\nValid Moves {self.current_turn}: ")
         for move in all_valid_moves:
             print(f"  {move['position'][0]} {move['position'][1]} {move['height']} {move['direction']}")
 
