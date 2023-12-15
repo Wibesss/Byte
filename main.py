@@ -1,8 +1,6 @@
 import sys
-import math
 from board import *
 from gui import *
-from constants import BOARD_WIDTH
 from constants import COLOR_ACTIVE
 
 WINDOW_WIDTH = 1680
@@ -19,10 +17,8 @@ COMPUTER = "B"
 PLAYER = "R"
 
 
-RED_PLAYER_POINTS=0
-BLUE_PLAYER_POINTS=0
-
-
+RED_PLAYER_POINTS = 0
+BLUE_PLAYER_POINTS = 0
 
 
 def handleButtonClick(mouse_pos):
@@ -48,8 +44,6 @@ def handleButtonClick(mouse_pos):
     return None, None
 
 
-
-
 def handleInputEvent(event, active_input_list, active_input_index):
     if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_BACKSPACE:
@@ -64,14 +58,13 @@ def handleInputEvent(event, active_input_list, active_input_index):
     return None
 
 
-
-
 def giveColors(first_move):
     global PLAYER
     global COMPUTER
     if first_move == "PLAYER":
         COMPUTER = "R"
         PLAYER = "B"
+
 
 def getNumberOfRows():
     while True:
@@ -87,13 +80,12 @@ def main():
     PIECE_ACTIVE_INPUT = None
     global PIECE_INPUT_TEXTS
     global PIECE_INPUT_TEXTS_SURFACE
-    global BOARD_WIDTH
 
-    rows=getNumberOfRows()
+    rows = getNumberOfRows()
 
-    #giveColors(input("Choose who plays first PLAYER or COMPUTER: "))
+    # giveColors(input("Choose who plays first PLAYER or COMPUTER: "))
 
-    board = Board(rows,BOARD_WIDTH)
+    board = Board(rows, BOARD_WIDTH)
 
     ClientWindow = pygame.display.set_mode((WINDOW_WIDTH, BOARD_WIDTH + 100))
     pygame.display.set_caption('Bytes')
@@ -106,7 +98,6 @@ def main():
                 print('EXIT SUCCESSFUL')
                 pygame.quit()
                 sys.exit()
-               
 
             if MOVE_ACTIVE_INPUT is not None:
                 move_input_surface = handleInputEvent(event, MOVE_INPUT_TEXTS, MOVE_ACTIVE_INPUT)
@@ -145,16 +136,13 @@ def main():
                             if board.checkIfMoveIsValid(row, col, heightInStack, direction):
                                 board.changeTurn()
                                 board.playMove(row, col, heightInStack, direction)
-                                print("Red Points:",RED_PLAYER_POINTS)
-                                print("Blue Points:",BLUE_PLAYER_POINTS)
-                                if  board.isGameFinished():
-                                    print('EXIT SUCCESSFUL')
+                                print("Red Points:", board.red_player_points)
+                                print("Blue Points:", board.blue_player_points)
+                                if board.isGameFinished():
+                                    print('Exit Successful')
                                     pygame.quit()
                                     sys.exit()
                                 board.getAllMoves()
-                            else:
-                                board.changeTurn()
-                              
 
                     elif input_type == "button_piece":
                         if all(text != '' for text in PIECE_INPUT_TEXTS):
@@ -166,7 +154,7 @@ def main():
                             # PIECE_INPUT_TEXTS = ["", "", ""]
                             # PIECE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, COLOR_ACTIVE) for text in PIECE_INPUT_TEXTS]
                         
-        board.updateDisplay(ClientWindow,MOVE_INPUT_TEXTS_SURFACE,PIECE_INPUT_TEXTS_SURFACE)
+        board.updateDisplay(ClientWindow, MOVE_INPUT_TEXTS_SURFACE, PIECE_INPUT_TEXTS_SURFACE)
 
 
 if __name__ == "__main__":
