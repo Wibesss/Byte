@@ -253,6 +253,7 @@ class Board:
     def getAllMoves(self):
         all_valid_moves = []
         all_invalid_moves = []
+        self.possible_boards.clear()
 
         for i in range(self.rows):
             for j in range(self.rows):
@@ -260,7 +261,7 @@ class Board:
                     for direction in ["DD", "DL", "GD", "GL"]:
                         for height in range(self.board[i][j].returnNumberOfPieces()):
                             move_validity = self.checkIfMoveIsValid(boardLabels[i], str(j + 1), height, direction)
-
+ 
                             move_info = {"position": (boardLabels[i], str(j + 1)), "direction": direction, "height": height}
 
                             if move_validity:
