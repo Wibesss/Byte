@@ -15,7 +15,7 @@ class Square:
     def add(self, newPiece):
         self.pieces.append(newPiece)
 
-    def draw(self, window,rows):
+    def draw(self, window, rows):
         pygame.draw.rect(window, self.color, (self.x + 50, self.y + 50, BOARD_WIDTH / rows, BOARD_WIDTH / rows))
         i = 0
         for piece in self.pieces:
@@ -26,10 +26,13 @@ class Square:
     def removePieces(self, index):
         self.pieces = self.pieces[:index]
 
+    def returnNumberOfPiecesForSpecifiColor(self,color):
+        return sum(1 for piece in self.pieces if piece.returnColor() == color)
+
     def clearPieces(self):
         self.pieces.clear()
     
-    def returnPiece(self,index):
+    def returnPiece(self, index):
         return self.pieces[index]
 
     def returnNumberOfPieces(self):
@@ -39,7 +42,7 @@ class Square:
         return True if len(self.pieces) > 0 else False
     
     def checkIfCompleted(self):
-        return True if self.returnNumberOfPieces()==8 else False
+        return True if self.returnNumberOfPieces() == 8 else False
     
     def returnColor(self):
         return self.color
