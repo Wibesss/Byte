@@ -59,11 +59,10 @@ def handleInputEvent(event, active_input_list, active_input_index):
 
 
 def giveColors(first_move):
-    global PLAYER
-    global COMPUTER
     if first_move == "PLAYER":
-        COMPUTER = "R"
-        PLAYER = "B"
+        return 'R'
+    else:
+        return 'B'
 
 
 def getNumberOfRows():
@@ -83,9 +82,9 @@ def main():
 
     rows = getNumberOfRows()
 
-    # giveColors(input("Choose who plays first PLAYER or COMPUTER: "))
+    first_move = giveColors(input("Choose who plays first PLAYER or COMPUTER: "))
 
-    board = Board(rows, BOARD_WIDTH)
+    board = Board(rows, BOARD_WIDTH, first_move)
 
     ClientWindow = pygame.display.set_mode((WINDOW_WIDTH, BOARD_WIDTH + 100))
     pygame.display.set_caption('Bytes')

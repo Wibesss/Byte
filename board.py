@@ -1,5 +1,6 @@
 import math
 import pygame
+import random
 from piece import Piece
 from square import Square
 from constants import BLACK
@@ -10,24 +11,23 @@ boardLabels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 
 
 
 class Board:
-    def __init__(self, rows, width):
+    def __init__(self, rows, width, first_move):
         self.width = width
         self.rows = rows
         self.board = self.makeBoard()
         self.blue_player_points = 0
         self.red_player_points = 0
-        self.current_turn = 'B'
+        self.current_turn = first_move
         self.possible_boards = []
-        self.all_valid_moves=[]
+        self.all_valid_moves = []
 
     def returnCurrentTurn(self):
         return self.current_turn
 
     def copy(self):
-        new_board = Board(self.rows, self.width)
+        new_board = Board(self.rows, self.width, self.current_turn)
         new_board.blue_player_points = self.blue_player_points
         new_board.red_player_points = self.red_player_points
-        new_board.current_turn = self.current_turn
 
         for i in range(self.rows):
             for j in range(self.rows):
@@ -352,8 +352,6 @@ class Board:
             newSquare.clearPieces()
         
         self.changeTurn()
-       
-
 
 
     def getBestMove(self, depth):
@@ -362,11 +360,12 @@ class Board:
         best_move = None
         alpha = float('-inf')
         beta = float('inf')
+        random.shuffle(self.possible_boards)
 
         for i, possible_state in enumerate(self.possible_boards):
             possible_state.getAllMoves()
 
-            eval_child = possible_state.minimax(depth - 1, False, alpha, beta)
+            eval_child = possible_state.minimax(depth - 1, True, alpha, beta, self)
 
             if eval_child > best_value:
                 best_value = eval_child
@@ -375,49 +374,45 @@ class Board:
             alpha = max(alpha, eval_child)
 
             if beta <= alpha:
-                print("Beta < Alpha (Pruning)")
                 break
 
         return best_move
 
-    def heuristic(self):
-        blue_points = self.blue_player_points
-        blue_pieces_count = sum(sum(square.returnNumberOfPiecesForSpecifiColor("B") for square in row) for row in self.board)
-       
-
-        red_points = self.red_player_points
+    def heuristic(self, previous, maximizing_player):
+        blue_pieces_count = sum(sum(square.returnNumberOfPiecesForSpecifiColor("B") for square in row) for row in self.board) 
         red_pieces_count = sum(sum(square.returnNumberOfPiecesForSpecifiColor("R") for square in row) for row in self.board)
-     
 
-        return 50 * (blue_points - red_points) + 0.5 * (blue_pieces_count - red_pieces_count) 
+        blue_stacks = sum(sum(1 for square in row if square.returnNumberOfPieces() > 1 and square.pieces[0].returnColor() == "B") for row in self.board)
+        red_stacks = sum(sum(1 for square in row if square.returnNumberOfPieces() > 1 and square.pieces[0].returnColor() == "R") for row in self.board)
+
+
+        return 10 * (self.blue_player_points - previous.blue_player_points - self.red_player_points + previous.red_player_points) + 0.5 * (blue_pieces_count - red_pieces_count) + (0.1 * len(self.possible_boards) * 1 if maximizing_player else -1) + blue_stacks - red_stacks 
 
 
     
-    def minimax(self,depth, maximizing_player, alpha, beta):
+    def minimax(self, depth, maximizing_player, alpha, beta, previous):
         if depth == 0 or self.isGameFinished():
-            x=self.heuristic()
+            x=self.heuristic(previous, maximizing_player)
             return x
 
         if maximizing_player:
             max_eval = float('-inf')
             for i, possible_state in enumerate(self.possible_boards):
                 possible_state.getAllMoves()
-                eval_child = possible_state.minimax(depth - 1, False, alpha, beta)
+                eval_child = possible_state.minimax(depth - 1, False, alpha, beta, self)
                 max_eval = max(max_eval, eval_child)
                 alpha = max(alpha, eval_child)
                 if beta <= alpha:
-                    print("Beta<Alpha(Max)")
                     break
             return max_eval
         else:
             min_eval = float('inf')
             for i, possible_state in enumerate(self.possible_boards):
                 possible_state.getAllMoves()
-                eval_child = possible_state.minimax(depth - 1, True, alpha, beta)
+                eval_child = possible_state.minimax(depth - 1, True, alpha, beta, self)
                 min_eval = min(min_eval, eval_child)
                 beta = min(beta, eval_child)
                 if beta <= alpha:
-                    print("Beta<Alpha(Min)")
                     break
             return min_eval
         
