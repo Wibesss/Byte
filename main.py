@@ -40,8 +40,12 @@ def handleButtonClick(mouse_pos):
 
     if BTN_RESET_BOARD_RECT.collidepoint(mouse_pos):
         return "button_reset", None
+    
+    if BTN_ACTIVATE_AI_RECT.collidepoint(mouse_pos):
+        return "button_activate_ai", None  
 
     return None, None
+
 
 
 def handleInputEvent(event, active_input_list, active_input_index):
@@ -72,13 +76,15 @@ def getNumberOfRows():
             print("Invalid input. Please choose 8, 10, or 16.")
         else:
             return rows
-
+        
+AI_ACTIVE = False
 
 def main():
     MOVE_ACTIVE_INPUT = None
     PIECE_ACTIVE_INPUT = None
     global PIECE_INPUT_TEXTS
     global PIECE_INPUT_TEXTS_SURFACE
+    global AI_ACTIVE
 
     rows = getNumberOfRows()
 
@@ -117,12 +123,17 @@ def main():
                         PIECE_ACTIVE_INPUT = clicked_input
                         MOVE_ACTIVE_INPUT = None
 
+                    
+
                 elif clicked_input is None and input_type is not None:
                     if input_type == "button_clean":
                         board.clearBoard()
 
                     elif input_type == "button_reset":
                         board.resetBoard()
+
+                    elif input_type == "button_activate_ai":
+                        AI_ACTIVE = True    
                 
                     elif input_type == "button_move":
                         if all(text != '' for text in MOVE_INPUT_TEXTS):
@@ -152,7 +163,7 @@ def main():
 
        
 
-        if board.returnCurrentTurn() == 'B':
+        if AI_ACTIVE and board.returnCurrentTurn() == 'B':
             print("Blue turn")
             move = board.getBestMove(3)
             if move is not None:

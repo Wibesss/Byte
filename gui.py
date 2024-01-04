@@ -15,6 +15,8 @@ MOVE_INPUT_BOXES = [
 ]
 BTN_MOVE_RECT = pygame.Rect(MOVE_INPUT_RECT.left + 50, MOVE_INPUT_RECT.top + 200, 200, 50)
 
+BTN_ACTIVATE_AI_RECT=pygame.Rect(BOARD_WIDTH + 500, BOARD_WIDTH - 70, 180, 50)
+
 
 PIECE_INPUT_RECT = pygame.Rect(BOARD_WIDTH + 300, 450, 270, 150)
 PIECE_INPUT_BOXES = [
@@ -64,6 +66,11 @@ def drawGui(win, MOVE_INPUT_TEXTS_SURFACE, PIECE_INPUT_TEXTS_SURFACE, current_tu
     font = pygame.font.Font(None, 36)
     button_text = font.render("Confirm Move", True, (255, 255, 255))
     win.blit(button_text, (BTN_MOVE_RECT.x + 20, BTN_MOVE_RECT.y + 15))
+
+    pygame.draw.rect(win, BUTTON_COLOR, BTN_ACTIVATE_AI_RECT)
+    font = pygame.font.Font(None, 36)
+    button_text = font.render("Activate AI", True, (255, 255, 255))
+    win.blit(button_text, (BTN_ACTIVATE_AI_RECT.x + 20, BTN_ACTIVATE_AI_RECT.y + 15))
 
     pygame.draw.rect(win, BUTTON_COLOR, BTN_PIECE_RECT)
     font = pygame.font.Font(None, 36)

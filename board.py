@@ -389,7 +389,6 @@ class Board:
         return 10 * (self.blue_player_points - previous.blue_player_points - self.red_player_points + previous.red_player_points) + 0.5 * (blue_pieces_count - red_pieces_count) + (0.1 * len(self.possible_boards) * 1 if maximizing_player else -1) + blue_stacks - red_stacks 
 
 
-    
     def minimax(self, depth, maximizing_player, alpha, beta, previous):
         if depth == 0 or self.isGameFinished():
             x=self.heuristic(previous, maximizing_player)
