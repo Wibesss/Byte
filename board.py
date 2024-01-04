@@ -382,14 +382,14 @@ class Board:
 
     def heuristic(self):
         blue_points = self.blue_player_points
-        blue_pieces_count = sum(sum(square.returnNumberOfPiecesForSpecificColor("B") for square in row) for row in self.board)
-        blue_avg_stack_height = 
+        blue_pieces_count = sum(sum(square.returnNumberOfPiecesForSpecifiColor("B") for square in row) for row in self.board)
+       
 
         red_points = self.red_player_points
-        red_pieces_count = sum(sum(square.returnNumberOfPiecesForSpecificColor("R") for square in row) for row in self.board)
-        red_avg_stack_height = sum(sum(square.returnTotalHeight() for square in row) for row in self.board if row[0].returnColor() == "R") / red_pieces_count if red_pieces_count > 0 else 0
+        red_pieces_count = sum(sum(square.returnNumberOfPiecesForSpecifiColor("R") for square in row) for row in self.board)
+     
 
-        return 50 * (blue_points - red_points) + 0.5 * (blue_pieces_count - red_pieces_count) + 0.1 * (blue_avg_stack_height - red_avg_stack_height)
+        return 50 * (blue_points - red_points) + 0.5 * (blue_pieces_count - red_pieces_count) 
 
 
     
