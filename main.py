@@ -5,6 +5,14 @@ from constants import COLOR_ACTIVE
 
 WINDOW_WIDTH = 1680
 
+AI_ACTIVE = False
+
+COMPUTER = "B"
+PLAYER = "R"
+
+RED_PLAYER_POINTS = 0
+BLUE_PLAYER_POINTS = 0
+
 pygame.init()
 
 FONT = pygame.font.Font(None, 36)
@@ -12,13 +20,6 @@ MOVE_INPUT_TEXTS = ["", "", "", ""]
 PIECE_INPUT_TEXTS = ["", "", ""]
 MOVE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, COLOR_ACTIVE) for text in MOVE_INPUT_TEXTS]
 PIECE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, COLOR_ACTIVE) for text in PIECE_INPUT_TEXTS]
-
-COMPUTER = "B"
-PLAYER = "R"
-
-
-RED_PLAYER_POINTS = 0
-BLUE_PLAYER_POINTS = 0
 
 
 def handleButtonClick(mouse_pos):
@@ -45,7 +46,6 @@ def handleButtonClick(mouse_pos):
         return "button_activate_ai", None  
 
     return None, None
-
 
 
 def handleInputEvent(event, active_input_list, active_input_index):
@@ -77,7 +77,6 @@ def getNumberOfRows():
         else:
             return rows
         
-AI_ACTIVE = False
 
 def main():
     MOVE_ACTIVE_INPUT = None
@@ -123,8 +122,6 @@ def main():
                         PIECE_ACTIVE_INPUT = clicked_input
                         MOVE_ACTIVE_INPUT = None
 
-                    
-
                 elif clicked_input is None and input_type is not None:
                     if input_type == "button_clean":
                         board.clearBoard()
@@ -158,10 +155,6 @@ def main():
                             color = PIECE_INPUT_TEXTS[2]
                             board.addPieceToSquare(row, col, color)
                             board.getAllMoves()
-                            # PIECE_INPUT_TEXTS = ["", "", ""]
-                            # PIECE_INPUT_TEXTS_SURFACE = [FONT.render(text, True, COLOR_ACTIVE) for text in PIECE_INPUT_TEXTS]
-
-       
 
         if AI_ACTIVE and board.returnCurrentTurn() == 'B':
             print("Blue turn")

@@ -5,7 +5,6 @@ from constants import COLOR_ACTIVE
 GUI_WIDTH = 800
 GUI_COLOR = (150, 150, 150)
 
-
 MOVE_INPUT_RECT = pygame.Rect(BOARD_WIDTH + 300, 150, 270, 150)
 MOVE_INPUT_BOXES = [
     pygame.Rect(MOVE_INPUT_RECT.left + 50, MOVE_INPUT_RECT.top, 270, 32),

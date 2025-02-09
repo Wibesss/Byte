@@ -21,8 +21,10 @@ class Board:
         self.possible_boards = []
         self.all_valid_moves = []
 
+
     def returnCurrentTurn(self):
         return self.current_turn
+
 
     def copy(self):
         new_board = Board(self.rows, self.width, self.current_turn)
@@ -34,6 +36,7 @@ class Board:
                 new_board.board[i][j].pieces = self.board[i][j].pieces.copy()
 
         return new_board
+
 
     def makeBoard(self):
         board = []
@@ -52,13 +55,16 @@ class Board:
                 board[i].append(square)
         return board
 
+
     def clearPossibleBoards(self):
         self.possible_boards.clear()
+
 
     def clearBoard(self):
         for row in self.board:
             for col in row:
                 col.clearPieces()
+
 
     def resetBoard(self):
         self.clearBoard()
@@ -76,11 +82,13 @@ class Board:
                     square.add(Piece("R"))
                 self.board[i].append(square)
 
+
     def changeTurn(self):
         if self.current_turn == "B":
             self.current_turn = "R"
         else:
             self.current_turn = "B"
+
 
     def addPieceToSquare(self, row, col, pieceColor):
         intRow = boardLabels.index(row)
@@ -100,6 +108,7 @@ class Board:
             new_piece = Piece(pieceColor)
             self.board[intRow][intCol - 1].add(new_piece)
 
+
     def isBoardClear(self):
         isClear = True
         for row in self.board:
@@ -107,17 +116,21 @@ class Board:
                 if col.hasPieces():
                     isClear = False
         return isClear
+    
 
     def squareInBoard(self, row, col):
         return True if row in boardLabels and boardLabels.index(row) < self.rows and int(col) - 1 < self.rows and int(
             col) - 1 >= 0 else False
 
+
     def piecesOnSquare(self, row, col):
         return self.board[boardLabels.index(row)][int(col) - 1].hasPieces()
+    
 
     def pieceInStack(self, row, col, heightInStack):
         return True if 0 <= int(heightInStack) < self.board[boardLabels.index(row)][
             int(col) - 1].returnNumberOfPieces() else False
+        
 
     def directionPossible(self, row, col, direction):
         if direction == "DD":
@@ -131,6 +144,7 @@ class Board:
 
         if direction == "GL":
             return True if boardLabels.index(row) > 0 and int(col) > 1 else False
+        
 
     def checkIfMoveIsValid(self, row, col, heightInStack, direction):
         if not self.squareInBoard(row, col):
@@ -152,6 +166,7 @@ class Board:
                         return self.compareDistances(intRow, intCol, direction)
                     else:
                         return False
+                    
 
     def checkAdjacent(self, intRow, intCol, ignoreRow, ignoreCol):
         if intRow - 1 >= 0 and intCol - 1 >= 0 and self.board[intRow - 1][intCol - 1].hasPieces() and (
@@ -168,6 +183,7 @@ class Board:
             return True
         else:
             return False
+        
 
     def checkIfPieceIsValidColor(self, row, col, heightInStack):
         intRow = boardLabels.index(row)
@@ -179,6 +195,7 @@ class Board:
                 return False
         else:
             return False
+        
 
     def isGameFinished(self):
         if self.isBoardClear():
@@ -190,6 +207,7 @@ class Board:
             print("BLUE PLAYER WON!!!")
             return True
         return False
+    
 
     def checkMerging(self, row, col, heightInStack, direction):
         if direction == "DD":
@@ -223,6 +241,7 @@ class Board:
                                self.board[boardLabels.index(row)][int(col) - 1].returnNumberOfPieces() - int(
                     heightInStack) <= 8 and self.board[boardLabels.index(row) - 1][
                                    int(col) - 2].returnNumberOfPieces() > int(heightInStack) else False
+                    
 
     def findClosestPiece(self, row, col, distance):
         for i in range(row - distance, row + distance + 1):
@@ -238,6 +257,7 @@ class Board:
         if distance == self.rows:
             return distance
         return self.findClosestPiece(row, col, distance + 1)
+    
 
     def compareDistances(self, intRow, intCol, direction):
 
@@ -264,6 +284,7 @@ class Board:
             return True
         else:
             return False
+        
 
     def getAllMoves(self):
         all_invalid_moves = []
@@ -292,15 +313,7 @@ class Board:
 
         if len(self.all_valid_moves) == 0:
             self.changeTurn()
-
-        # print(f"\nValid Moves {self.current_turn}: ")
-        # for move in self.all_valid_moves:
-        #     print(f"  {move['position'][0]} {move['position'][1]} {move['height']} {move['direction']}")
-
-        # print(f"\nInvalid Moves {self.current_turn}:")
-        # for move in all_invalid_moves:
-        #     print(f"  {move['position'][0]} {move['position'][1]} {move['height']} {move['direction']}")
-
+            
 
     def updateDisplay(self, win, moveInputs, pieceInputs):
         if self.current_turn == "B":
@@ -313,6 +326,7 @@ class Board:
             for spot in row:
                 spot.draw(win, self.rows)
         pygame.display.update()
+        
 
     def playMove(self, row, col, heightInStack, direction):
         intRow = boardLabels.index(row)
@@ -377,6 +391,7 @@ class Board:
                 break
 
         return best_move
+
 
     def heuristic(self, previous, maximizing_player):
         blue_pieces_count = sum(sum(square.returnNumberOfPiecesForSpecifiColor("B") for square in row) for row in self.board) 
